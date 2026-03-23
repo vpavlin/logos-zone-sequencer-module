@@ -17,10 +17,12 @@ public:
     Q_INVOKABLE void initLogos(LogosAPI* api) override;
     Q_INVOKABLE void set_node_url(const QString& url) override;
     Q_INVOKABLE void set_signing_key(const QString& hex) override;
+    Q_INVOKABLE void set_checkpoint_path(const QString& path) override;
     Q_INVOKABLE QString publish(const QString& data) override;
 signals:
     void eventResponse(const QString& eventName, const QVariantList& data);
 private:
     QString m_nodeUrl = QStringLiteral("http://localhost:8080");
     QString m_signingKey;
+    QString m_checkpointPath;
 };

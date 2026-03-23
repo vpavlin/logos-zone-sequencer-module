@@ -3,8 +3,6 @@
 #include <QString>
 #include <QVariantList>
 
-// Use the real logos-cpp-sdk interface.h
-// We replicate its PluginInterface to avoid pulling in the full sdk during cmake
 class LogosAPI;
 
 class PluginInterface {
@@ -23,6 +21,7 @@ public:
     Q_INVOKABLE virtual void initLogos(LogosAPI* api) = 0;
     Q_INVOKABLE virtual void set_node_url(const QString& url) = 0;
     Q_INVOKABLE virtual void set_signing_key(const QString& hex) = 0;
+    Q_INVOKABLE virtual void set_checkpoint_path(const QString& path) = 0;
     Q_INVOKABLE virtual QString publish(const QString& data) = 0;
 };
 #define ILogosZoneSequencerModule_iid "org.logos.ilogoszonesquencermodule"
