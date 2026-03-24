@@ -16,8 +16,10 @@ else()
 endif()
 
 # ---- Rust FFI library ----
-set(ZONE_SEQUENCER_RS_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../zone-sequencer-rs")
-set(ZONE_SEQUENCER_RS_LIB_DIR "${ZONE_SEQUENCER_RS_ROOT}/target/release")
+if(NOT ZONE_SEQUENCER_RS_LIB_DIR)
+  set(ZONE_SEQUENCER_RS_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../zone-sequencer-rs")
+  set(ZONE_SEQUENCER_RS_LIB_DIR "${ZONE_SEQUENCER_RS_ROOT}/target/release")
+endif()
 set(ZONE_SEQUENCER_RS_LIB "${ZONE_SEQUENCER_RS_LIB_DIR}/libzone_sequencer_rs${DYLIB_EXT}")
 
 # ---- Plugin ----
@@ -33,11 +35,20 @@ set_property(TARGET ${PLUGIN_TARGET} PROPERTY PUBLIC_HEADER
     ${CMAKE_CURRENT_SOURCE_DIR}/src/i_logos_zone_sequencer_module.h
 )
 
-target_include_directories(${PLUGIN_TARGET} PRIVATE
-    /home/jimmy/logos-workspace/repos/logos-cpp-sdk
-    /home/jimmy/logos-workspace/repos/logos-cpp-sdk/cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+if(LOGOS_CPP_SDK_ROOT)
+  target_include_directories(${PLUGIN_TARGET} PRIVATE
+      ${LOGOS_CPP_SDK_ROOT}/include
+      ${LOGOS_CPP_SDK_ROOT}/include/cpp
+      ${LOGOS_CPP_SDK_ROOT}/include/core
+      ${CMAKE_CURRENT_SOURCE_DIR}/src
+  )
+else()
+  target_include_directories(${PLUGIN_TARGET} PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/../logos-cpp-sdk
+      ${CMAKE_CURRENT_SOURCE_DIR}/../logos-cpp-sdk/cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/src
+  )
+endif()
 
 # Link by name (-lzone_sequencer_rs) so the NEEDED entry uses the soname, not an absolute path.
 # This lets the runtime linker find the library via RUNPATH ($ORIGIN).
@@ -58,8 +69,8 @@ if(APPLE)
     )
 elseif(UNIX)
     set_target_properties(${PLUGIN_TARGET} PROPERTIES
-        BUILD_RPATH "$ORIGIN:/nix/store/dkfr32yi7p8cdxsnll05q1kax19fl7ay-qtbase-6.9.2/lib:/nix/store/r2cq6la02msp6kfcl9a17d2l2n96qpvs-qtremoteobjects-6.9.2/lib"
-        INSTALL_RPATH "$ORIGIN:/nix/store/dkfr32yi7p8cdxsnll05q1kax19fl7ay-qtbase-6.9.2/lib:/nix/store/r2cq6la02msp6kfcl9a17d2l2n96qpvs-qtremoteobjects-6.9.2/lib"
+        BUILD_RPATH "$ORIGIN"
+        INSTALL_RPATH "$ORIGIN"
     )
 endif()
 
