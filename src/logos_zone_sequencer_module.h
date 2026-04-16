@@ -18,6 +18,7 @@ public:
     Q_INVOKABLE void set_node_url(const QString& url) override;
     Q_INVOKABLE void set_signing_key(const QString& hex) override;
     Q_INVOKABLE void set_checkpoint_path(const QString& path) override;
+    Q_INVOKABLE QString get_channel_id() override;
     Q_INVOKABLE QString publish(const QString& data) override;
     Q_INVOKABLE QString query_channel(const QString& channelId, int limit) override;
 signals:

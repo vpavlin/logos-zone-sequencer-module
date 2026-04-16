@@ -46,6 +46,7 @@ else()
   target_include_directories(${PLUGIN_TARGET} PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/../logos-cpp-sdk
       ${CMAKE_CURRENT_SOURCE_DIR}/../logos-cpp-sdk/cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/../logos-cpp-sdk/core
       ${CMAKE_CURRENT_SOURCE_DIR}/src
   )
 endif()
@@ -53,10 +54,19 @@ endif()
 # Link by name (-lzone_sequencer_rs) so the NEEDED entry uses the soname, not an absolute path.
 # This lets the runtime linker find the library via RUNPATH ($ORIGIN).
 target_link_directories(${PLUGIN_TARGET} PRIVATE "${ZONE_SEQUENCER_RS_LIB_DIR}")
-target_link_libraries(${PLUGIN_TARGET} PRIVATE
-    Qt6::Core
-    zone_sequencer_rs
-)
+
+if(LOGOS_CPP_SDK_ROOT)
+    target_link_libraries(${PLUGIN_TARGET} PRIVATE
+        Qt6::Core
+        zone_sequencer_rs
+        ${LOGOS_CPP_SDK_ROOT}/lib/liblogos_sdk.a
+    )
+else()
+    target_link_libraries(${PLUGIN_TARGET} PRIVATE
+        Qt6::Core
+        zone_sequencer_rs
+    )
+endif()
 
 target_compile_definitions(${PLUGIN_TARGET} PRIVATE
     LOGOS_ZONE_SEQUENCER_MODULE_METADATA_FILE="${CMAKE_CURRENT_SOURCE_DIR}/metadata.json"

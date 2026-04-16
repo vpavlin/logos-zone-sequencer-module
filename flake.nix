@@ -16,7 +16,8 @@
       url = "github:logos-co/logos-package/9e3730d5c0e3ec955761c05b50e3a6047ee4030b";
     };
     zone-sequencer-rs = {
-      url = "github:jimmy-claw/zone-sequencer-rs/a5829147dfa0f921a43b03a73d76ba6e1b759cf2";
+      # Updated to include zone_derive_channel_id (commit 4a1c4ad)
+      url = "github:jimmy-claw/zone-sequencer-rs/4a1c4ad540779d725562a82a814cba9c6c906d7b";
       flake = false;
     };
   };

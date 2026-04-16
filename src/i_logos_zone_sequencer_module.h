@@ -22,6 +22,7 @@ public:
     Q_INVOKABLE virtual void set_node_url(const QString& url) = 0;
     Q_INVOKABLE virtual void set_signing_key(const QString& hex) = 0;
     Q_INVOKABLE virtual void set_checkpoint_path(const QString& path) = 0;
+    Q_INVOKABLE virtual QString get_channel_id() = 0;
     Q_INVOKABLE virtual QString publish(const QString& data) = 0;
     Q_INVOKABLE virtual QString query_channel(const QString& channelId, int limit) = 0;
 };

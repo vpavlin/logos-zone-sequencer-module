@@ -1,5 +1,7 @@
 #include "logos_zone_sequencer_module.h"
 #include "zone_sequencer.h"
+#include "logos_api.h"
+#include "logos_api_provider.h"
 #include <QDebug>
 
 LogosZoneSequencerModule::LogosZoneSequencerModule() {}
@@ -8,6 +10,8 @@ LogosZoneSequencerModule::~LogosZoneSequencerModule() {}
 void LogosZoneSequencerModule::initLogos(LogosAPI* api) {
     logosAPI = api;
     qInfo() << "ZoneSequencer: initLogos called";
+    api->getProvider()->registerObject(name(), this);
+    qInfo() << "ZoneSequencer: registered as remote object:" << name();
 }
 
 void LogosZoneSequencerModule::set_node_url(const QString& url) {
@@ -23,6 +27,19 @@ void LogosZoneSequencerModule::set_signing_key(const QString& hex) {
 void LogosZoneSequencerModule::set_checkpoint_path(const QString& path) {
     m_checkpointPath = path;
     qInfo() << "ZoneSequencer: checkpoint_path =" << path;
+}
+
+QString LogosZoneSequencerModule::get_channel_id() {
+    if (m_signingKey.isEmpty()) {
+        return QStringLiteral("Error: signing key not set");
+    }
+    char* result = zone_derive_channel_id(m_signingKey.toUtf8().constData());
+    if (!result) {
+        return QStringLiteral("Error: zone_derive_channel_id returned null");
+    }
+    QString channelId = QString::fromUtf8(result);
+    zone_free_string(result);
+    return channelId;
 }
 
 QString LogosZoneSequencerModule::publish(const QString& data) {
