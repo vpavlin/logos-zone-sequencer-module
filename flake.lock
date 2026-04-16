@@ -615,17 +615,17 @@
     "zone-sequencer-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1774282760,
-        "narHash": "sha256-eFJMLLhQEwWp6AOr9ePSSi3AnsweY5+n4eC4HQE875M=",
-        "owner": "jimmy-claw",
+        "lastModified": 1776327104,
+        "narHash": "sha256-FjsOIxj4GuuoilVcubQx0bZTkLtFq0QkquUEYCHNKaw=",
+        "owner": "vpavlin",
         "repo": "zone-sequencer-rs",
-        "rev": "a5829147dfa0f921a43b03a73d76ba6e1b759cf2",
+        "rev": "4a1c4ad540779d725562a82a814cba9c6c906d7b",
         "type": "github"
       },
       "original": {
-        "owner": "jimmy-claw",
+        "owner": "vpavlin",
         "repo": "zone-sequencer-rs",
-        "rev": "a5829147dfa0f921a43b03a73d76ba6e1b759cf2",
+        "rev": "4a1c4ad540779d725562a82a814cba9c6c906d7b",
         "type": "github"
       }
     }
