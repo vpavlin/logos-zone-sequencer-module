@@ -2,6 +2,7 @@
 #include "i_logos_zone_sequencer_module.h"
 #include <QObject>
 #include <QString>
+#include <QtConcurrent/QtConcurrentRun>
 
 class LogosAPI;
 
@@ -35,4 +36,5 @@ private:
     QString m_checkpointPath;
     QString m_channelId;
     void*   m_sequencerHandle = nullptr;
+    bool    m_creatingSequencer = false;
 };

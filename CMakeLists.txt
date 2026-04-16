@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # ---- Qt ----
-find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core Concurrent)
 set(CMAKE_AUTOMOC ON)
 
 # ---- OS Specifics ----
@@ -58,12 +58,14 @@ target_link_directories(${PLUGIN_TARGET} PRIVATE "${ZONE_SEQUENCER_RS_LIB_DIR}")
 if(LOGOS_CPP_SDK_ROOT)
     target_link_libraries(${PLUGIN_TARGET} PRIVATE
         Qt6::Core
+        Qt6::Concurrent
         zone_sequencer_rs
         ${LOGOS_CPP_SDK_ROOT}/lib/liblogos_sdk.a
     )
 else()
     target_link_libraries(${PLUGIN_TARGET} PRIVATE
         Qt6::Core
+        Qt6::Concurrent
         zone_sequencer_rs
     )
 endif()

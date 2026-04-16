@@ -15,10 +15,9 @@ LogosZoneSequencerModule::~LogosZoneSequencerModule() {
 }
 
 void LogosZoneSequencerModule::initLogos(LogosAPI* api) {
+    if (logosAPI) return;  // guard against double init
     logosAPI = api;
     qInfo() << "ZoneSequencer: initLogos called";
-    api->getProvider()->registerObject(name(), this);
-    qInfo() << "ZoneSequencer: registered as remote object:" << name();
 }
 
 void LogosZoneSequencerModule::set_node_url(const QString& url) {
@@ -46,21 +45,36 @@ void LogosZoneSequencerModule::set_channel_id(const QString& channelIdHex) {
 }
 
 void LogosZoneSequencerModule::tryCreateSequencer() {
-    if (m_sequencerHandle) return;
+    if (m_sequencerHandle || m_creatingSequencer) return;
     if (m_nodeUrl.isEmpty() || m_signingKey.isEmpty() || m_channelId.isEmpty()) return;
 
-    qInfo() << "ZoneSequencer: creating persistent sequencer...";
-    m_sequencerHandle = zone_sequencer_create(
-        m_nodeUrl.toUtf8().constData(),
-        m_channelId.toUtf8().constData(),
-        m_signingKey.toUtf8().constData(),
-        m_checkpointPath.toUtf8().constData());
+    m_creatingSequencer = true;
+    qInfo() << "ZoneSequencer: creating persistent sequencer (async)...";
 
-    if (m_sequencerHandle) {
-        qInfo() << "ZoneSequencer: persistent sequencer created";
-    } else {
-        qWarning() << "ZoneSequencer: failed to create persistent sequencer";
-    }
+    // Run in a separate thread so it doesn't block the IPC call
+    // (zone_sequencer_create bootstraps last_msg_id from the chain, which can take seconds)
+    auto nodeUrl = m_nodeUrl;
+    auto channelId = m_channelId;
+    auto signingKey = m_signingKey;
+    auto checkpointPath = m_checkpointPath;
+
+    QtConcurrent::run([this, nodeUrl, channelId, signingKey, checkpointPath]() {
+        void* handle = zone_sequencer_create(
+            nodeUrl.toUtf8().constData(),
+            channelId.toUtf8().constData(),
+            signingKey.toUtf8().constData(),
+            checkpointPath.toUtf8().constData());
+
+        QMetaObject::invokeMethod(this, [this, handle]() {
+            m_sequencerHandle = handle;
+            m_creatingSequencer = false;
+            if (handle) {
+                qInfo() << "ZoneSequencer: persistent sequencer created";
+            } else {
+                qWarning() << "ZoneSequencer: failed to create persistent sequencer";
+            }
+        }, Qt::QueuedConnection);
+    });
 }
 
 QString LogosZoneSequencerModule::get_channel_id() {
@@ -79,6 +93,8 @@ QString LogosZoneSequencerModule::get_channel_id() {
 
 QString LogosZoneSequencerModule::publish(const QString& data) {
     if (!m_sequencerHandle) {
+        if (m_creatingSequencer)
+            return QStringLiteral("Error: sequencer still initializing, try again shortly");
         return QStringLiteral("Error: sequencer not initialized (call set_channel_id first)");
     }
     qInfo() << "ZoneSequencer: publishing via persistent sequencer";

@@ -2,7 +2,8 @@
   description = "Zone Sequencer Module for Logos App";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/bfc1b8a4574108ceef22f02bafcf6611380c100d";
+    nixpkgs.url = "github:NixOS/nixpkgs/e9f00bd893984bc8ce46c895c3bf7cac95331127";
+    nixpkgs-rust.url = "github:NixOS/nixpkgs/bfc1b8a4574108ceef22f02bafcf6611380c100d";
     logos-cpp-sdk = {
       url = "github:logos-co/logos-cpp-sdk/4b66dac015e4b977d33cfae80a4c8e1d518679f3";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,25 +22,26 @@
     };
   };
 
-  outputs = { self, nixpkgs, logos-cpp-sdk, logos-liblogos, logos-package, zone-sequencer-rs, ... }:
+  outputs = { self, nixpkgs, nixpkgs-rust, logos-cpp-sdk, logos-liblogos, logos-package, zone-sequencer-rs, ... }:
     let
       systems = [ "x86_64-linux" ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f {
         pkgs = import nixpkgs { inherit system; };
+        pkgsRust = import nixpkgs-rust { inherit system; };
         logosSdk = logos-cpp-sdk.packages.${system}.default;
         logosLiblogos = logos-liblogos.packages.${system}.default;
         lgxTool = logos-package.packages.${system}.lgx;
       });
     in
     {
-      packages = forAllSystems ({ pkgs, logosSdk, logosLiblogos, lgxTool }:
+      packages = forAllSystems ({ pkgs, pkgsRust, logosSdk, logosLiblogos, lgxTool }:
         let
           circuits = builtins.fetchTarball {
             url = "https://github.com/logos-blockchain/logos-blockchain/releases/download/0.2.1/logos-blockchain-circuits-v0.4.1-linux-x86_64.tar.gz";
             sha256 = "1xnhl4y2zpxvcgm0xx95v0v6av2amp5isfi0s92cxrjg7dqmp5z8";
           };
 
-          rustLib = pkgs.rustPlatform.buildRustPackage {
+          rustLib = pkgsRust.rustPlatform.buildRustPackage {
             pname = "zone-sequencer-rs";
             version = "0.1.0";
             src = zone-sequencer-rs;
@@ -56,8 +58,8 @@
 
             LOGOS_BLOCKCHAIN_CIRCUITS = circuits;
 
-            nativeBuildInputs = [ pkgs.pkg-config pkgs.perl ];
-            buildInputs = [ pkgs.openssl ];
+            nativeBuildInputs = [ pkgsRust.pkg-config pkgsRust.perl ];
+            buildInputs = [ pkgsRust.openssl ];
 
             installPhase = ''
               runHook preInstall
