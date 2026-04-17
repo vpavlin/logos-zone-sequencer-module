@@ -37,7 +37,7 @@
       packages = forAllSystems ({ pkgs, pkgsRust, logosSdk, logosLiblogos, lgxTool }:
         let
           circuits = builtins.fetchTarball {
-            url = "https://github.com/logos-blockchain/logos-blockchain/releases/download/0.2.1/logos-blockchain-circuits-v0.4.1-linux-x86_64.tar.gz";
+            url = "https://github.com/logos-blockchain/logos-blockchain/releases/download/0.1.1/logos-blockchain-circuits-v0.4.1-linux-x86_64.tar.gz";
             sha256 = "1xnhl4y2zpxvcgm0xx95v0v6av2amp5isfi0s92cxrjg7dqmp5z8";
           };
 
